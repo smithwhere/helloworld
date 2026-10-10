@@ -1172,10 +1172,22 @@ msgid "KcpTun Password"
 msgstr "KcpTun 密码"
 
 #: applications/luci-app-ssr-plus/luasrc/model/cbi/shadowsocksr/client-config.lua:1728
-msgid "KcpTun Port"
-msgstr "KcpTun 端口"
+msgid "KcpTun Port Range"
+msgstr "KcpTun 端口范围"
 
 #: applications/luci-app-ssr-plus/luasrc/model/cbi/shadowsocksr/status.lua:169
+msgid "Use one port or a min-max range. Leave empty when KcpTun is disabled."
+msgstr "请输入单个端口或起止端口范围；禁用 KcpTun 时可留空。"
+
+msgid "KcpTun Port Hop Interval"
+msgstr "端口随机跳跃时间"
+
+msgid "For a port range, new connections use the next tunnel after this interval; active sessions drain on the old tunnel."
+msgstr "使用端口范围时，到达此间隔后新连接切换到新隧道；已有会话继续使用旧隧道直至结束。"
+
+msgid "Enter a KcpTun port or port range when KcpTun is enabled"
+msgstr "启用 KcpTun 时请输入端口或端口范围"
+
 msgid "KcpTun Version"
 msgstr "KcpTun 版本号"
 

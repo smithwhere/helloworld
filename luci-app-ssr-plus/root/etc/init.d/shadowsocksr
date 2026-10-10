@@ -1110,11 +1110,30 @@ Start_Run() {
 		[ "0" == "$kcp_str" ] && return 1
 		local kcp_server=$(uci_get_by_name $GLOBAL_SERVER server)
 		local kcp_port=$(uci_get_by_name $GLOBAL_SERVER kcp_port)
+		local kcp_hop_interval=$(uci_get_by_name $GLOBAL_SERVER kcp_hop_interval 600)
 		local server_port=$(uci_get_by_name $GLOBAL_SERVER server_port)
 		local password=$(uci_get_by_name $GLOBAL_SERVER kcp_password)
 		local kcp_param=$(uci_get_by_name $GLOBAL_SERVER kcp_param)
-		[ "$password" != "" ] && password="--key "$password
-		service_start /usr/bin/kcptun-client -r $kcp_server:$kcp_port -l :$server_port $password $kcp_param
+		if [ -z "$kcp_port" ]; then
+			echolog "KcpTun is enabled but its port range is empty."
+			return 1
+		fi
+		case "$kcp_port" in
+		*-*)
+			service_start /usr/bin/python3 /usr/bin/kcp_port_hop.py \
+				--server "$kcp_server" \
+				--remote-ports "$kcp_port" \
+				--listen-port "$server_port" \
+				--interval "$kcp_hop_interval" \
+				--password "$password" \
+				--params "$kcp_param"
+			;;
+		*)
+			local kcp_key=""
+			[ -n "$password" ] && kcp_key="--key $password"
+			service_start /usr/bin/kcptun-client -r "$kcp_server:$kcp_port" -l ":$server_port" $kcp_key $kcp_param
+			;;
+		esac
 		kcp_enable_flag=1
 		ARG_UDP=""
 	fi
@@ -1740,6 +1759,7 @@ stop() {
 	if [ -z "$switch_server" ]; then
 		$PS -w | grep -v "grep" | grep ssr-switch | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
 		rm -f /var/lock/ssr-switch.lock
+		$PS -w | grep -v "grep" | grep kcp_port_hop.py | awk '{print $1}' | xargs kill >/dev/null 2>&1
 		killall -q -9 kcptun-client
 	fi
 	$PS -w | grep -v "grep" | grep ssr-monitor | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &

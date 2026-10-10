@@ -63,13 +63,26 @@ while [ "1" == "1" ]; do #死循环
 	fi
 	#kcptun
 	if [ "$kcp_process" -gt 0 ]; then
-		icount=$(busybox ps -w | grep kcptun-client | grep -v grep | wc -l)
-		if [ "$icount" -lt "$kcp_process" ]; then #如果进程挂掉就重启它
-			logger -t "$NAME" "ssrplus kcptun error.restart!"
-			echolog "ssrplus kcptun error.restart!"
-			killall -q -9 kcptun-client
-			(/usr/bin/kcptun-client -r $server:$kcp_port -l :$server_port $password $kcp_param &)
-		fi
+		case "$kcp_port" in
+		*-*)
+			icount=$(busybox ps -w | grep kcp_port_hop.py | grep -v grep | wc -l)
+			if [ "$icount" -lt 1 ]; then
+				logger -t "$NAME" "ssrplus kcptun port-hop supervisor error.restart!"
+				echolog "ssrplus kcptun port-hop supervisor error.restart!"
+				/etc/init.d/shadowsocksr restart
+				exit 0
+			fi
+			;;
+		*)
+			icount=$(busybox ps -w | grep kcptun-client | grep -v grep | wc -l)
+			if [ "$icount" -lt "$kcp_process" ]; then
+				logger -t "$NAME" "ssrplus kcptun error.restart!"
+				echolog "ssrplus kcptun error.restart!"
+				killall -q -9 kcptun-client
+				(/usr/bin/kcptun-client -r $server:$kcp_port -l :$server_port $password $kcp_param &)
+			fi
+			;;
+		esac
 	fi
 	#localsocks
 	if [ "$local_process" -gt 0 ]; then

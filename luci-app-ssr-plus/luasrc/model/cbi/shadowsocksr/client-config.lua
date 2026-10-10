@@ -1725,9 +1725,27 @@ if is_finded("kcptun-client") then
 	o:depends("type", "ssr")
 	o:depends("type", "ss")
 
-	o = s:option(Value, "kcp_port", translate("KcpTun Port"))
+	o = s:option(Value, "kcp_port", translate("KcpTun Port Range"))
 	o.datatype = "portrange"
-	o.default = 4000
+	o.default = ""
+	o.rmempty = true
+	o.placeholder = "4000-4100"
+	o.description = translate("Use one port or a min-max range. Leave empty when KcpTun is disabled.")
+	o:depends("type", "ssr")
+	o:depends("type", "ss")
+	o.validate = function(self, value, section)
+		local enabled = self.map.uci:get("shadowsocksr", section, "kcp_enable")
+		if enabled == "1" and (not value or value == "") then
+			return nil, translate("Enter a KcpTun port or port range when KcpTun is enabled")
+		end
+		return value
+	end
+
+	o = s:option(Value, "kcp_hop_interval", translate("KcpTun Port Hop Interval"))
+	o.datatype = "range(1,86400)"
+	o.default = "600"
+	o.rmempty = false
+	o.description = translate("For a port range, new connections use the next tunnel after this interval; active sessions drain on the old tunnel.")
 	o:depends("type", "ssr")
 	o:depends("type", "ss")
 
