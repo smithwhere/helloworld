@@ -1,0 +1,13 @@
+{
+  "client": "*",
+  "interface": "*",
+  "idle_seconds": 8,
+  "host_suffixes": [
+    "google.com",
+    "gstatic.com",
+    "googleapis.com",
+    "googleusercontent.com"
+  ],
+  "state_directory": "/var/run/ssrplus-kcp-hop",
+  "close_method": "auto"
+}

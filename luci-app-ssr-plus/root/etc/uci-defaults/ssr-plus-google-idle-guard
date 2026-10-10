@@ -1,0 +1,6 @@
+#!/bin/sh
+
+/etc/init.d/google-idle-guard enable
+/etc/init.d/google-idle-guard start
+
+exit 0

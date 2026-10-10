@@ -1,0 +1,14 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=10
+USE_PROCD=1
+
+start_service() {
+	procd_open_instance
+	procd_set_param command /usr/bin/python3 /usr/bin/google-idle-guard.py \
+		--config /etc/ssrplus/google-idle-guard.json
+	procd_set_param file /etc/ssrplus/google-idle-guard.json
+	procd_set_param respawn 3600 5 5
+	procd_close_instance
+}
