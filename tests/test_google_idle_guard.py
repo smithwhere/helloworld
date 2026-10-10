@@ -82,11 +82,11 @@ class GuardTests(unittest.TestCase):
     def test_expiry_requires_idle_empty_queues_and_current_nat(self):
         key = ('192.168.1.2', 50000, '142.251.154.119', 443)
         record = dict(client_ip=key[0], client_port=key[1], local_ip='192.168.1.1',
-                      local_port=1234, idle_ms=8100, queues=(0, 0), inode=77)
+                      local_port=1234, sent_idle_ms=8100, queues=(0, 0), inode=77)
         mapping = {(key[0], key[1], '192.168.1.1', 1234): key}
         tracked = {key: ('www.google.com', 0)}
         self.assertEqual(self.g.expiry_key(record, mapping, tracked, 8), key)
-        for updates in [dict(idle_ms=7999), dict(queues=(1, 0)), dict(queues=(0, 1)), dict(idle_ms=None)]:
+        for updates in [dict(sent_idle_ms=7999), dict(queues=(1, 0)), dict(queues=(0, 1)), dict(sent_idle_ms=None)]:
             self.assertIsNone(self.g.expiry_key(dict(record, **updates), mapping, tracked, 8))
         self.assertIsNone(self.g.expiry_key(record, {}, tracked, 8))
 
